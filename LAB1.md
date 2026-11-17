@@ -108,90 +108,90 @@
 ### Описание разработанной схемы
 В предложенной схеме устранена главная уязвимость исходного каркаса — отсутствие сегментации. Вместо единой плоской сети, где любой компьютер мог обратиться к любому серверу, среда разделена на **три зоны**:
 
-1. **Интернет (Недоверенная зона):**
-   Здесь находятся внешние пользователи (обучающиеся и педагоги из дома) и сторонние сервисы (например, платформы олимпиад). Доступ из этой зоны во внутреннюю сеть школы жестко ограничен.
+1. **Интернет (Недоверенная зона):** Внешние пользователи (ученики и педагоги из дома) и сторонние сервисы. Доступ во внутреннюю сеть жестко ограничен.
+2. **Периметр / DMZ (Доверительная граница 1):** Буферная зона с Межсетевым экраном (Firewall). Здесь находятся публичные сервисы: **LMS** и **Электронный журнал** (веб-доступ). Это позволяет работать из дома, не давая прямого доступа к базе данных школы.
+3. **Внутренняя сеть ОУ (Доверительная граница 2):** Защищенный сегмент. Здесь находятся АРМы сотрудников, компьютерные классы, а также критичные серверы: **Локальная база**, **Файловый сервер** и **NAS**. 
 
-2. **Периметр / DMZ (Доверительная граница 1):**
-   Это буферная зона между интернетом и внутренней сетью. В ней находится **Межсетевой экран (Firewall)**, который фильтрует трафик. Здесь же размещены сервисы, требующие доступа извне: **LMS** и **Электронный журнал** (веб-доступ). Это позволяет родителям и ученикам заходить в журнал, не получая прямого доступа к локальной базе данных школы.
-
-3. **Внутренняя сеть ОУ (Доверительная граница 2):**
-   Защищенный сегмент, в котором находятся АРМы администрации, педагогов и компьютерные классы. Здесь же расположены критичные данные: **Локальная база контингента**, **Файловый сервер** (внутреннее облако) и **NAS** для резервного копирования. Доступ из этой зоны во внешний мир контролируется межсетевым экраном.
-
-**Потоки данных (F1–F11):** На схеме отражены ключевые потоки. Например, поток F5 (передача данных из Локальной базы в Электронный журнал) происходит внутри защищенного периметра, а поток F1 (сдача работ обучающимися) проходит через межсетевой экран в LMS.
+**Потоки данных (F1–F11):** На схеме отражены ключевые потоки (например, F5 — передача данных из Локальной базы в Электронный журнал, и F1 — сдача работ в LMS).
 
 ### Диаграмма (Mermaid)
 
 ```mermaid
 flowchart TD
-    %% Стили для зон и компонентов
-    classDef internet fill:#ffe6e6,stroke:#ff0000,stroke-width:2px;
-    classDef dmz fill:#fff2cc,stroke:#d6b656,stroke-width:2px;
-    classDef internal fill:#d5e8d4,stroke:#82b366,stroke-width:2px;
-    classDef user fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px,shape:rect;
-    classDef server fill:#e1d5e7,stroke:#9673a6,stroke-width:2px,shape:cylinder;
-    classDef service fill:#f8cecc,stroke:#b85450,stroke-width:2px;
+    %% Настройка глобальных стилей для линий и текста
+    %% linkStyle default stroke:#333,stroke-width:2px;
+    classDef default font-weight:bold,color:#000,stroke-width:2px,stroke:#333;
+
+    %% Стили для зон
+    classDef zoneInternet fill:#ffebee,stroke:#d32f2f,stroke-width:3px,stroke-dasharray: 5 5,color:#b71c1c;
+    classDef zoneDMZ fill:#fff8e1,stroke:#f57f17,stroke-width:3px,stroke-dasharray: 5 5,color:#e65100;
+    classDef zoneInternal fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px,stroke-dasharray: 5 5,color:#1b5e20;
+
+    %% Стили для компонентов
+    classDef user fill:#bbdefb,stroke:#1565c0,stroke-width:2px,color:#000;
+    classDef service fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000;
+    classDef dmzNode fill:#ffe082,stroke:#ef6c00,stroke-width:2px,color:#000;
+    classDef server fill:#ce93d8,stroke:#6a1b9a,stroke-width:2px,color:#000;
+    classDef switch fill:#cfd8dc,stroke:#455a64,stroke-width:2px,color:#000;
 
     %% ГРАНИЦА 1: Интернет
-    subgraph Internet["🌐 Интернет (Недоверенная зона)"]
+    subgraph Internet["🌐 ИНТЕРНЕТ (Недоверенная зона)"]
         direction TB
         StExt["Обучающийся<br/>(из дома)"]:::user
         TchExt["Педагог<br/>(из дома)"]:::user
-        ExtSrv["Внешний сервис<br/>(Олимпиады/Кружки)"]:::service
+        ExtSrv["Внешний сервис<br/>(Олимпиады)"]:::service
     end
 
     %% ГРАНИЦА 2: DMZ
-    subgraph DMZ["🛡️ Периметр / DMZ (Доверительная граница 1)"]
+    subgraph DMZ["🛡️ ПЕРИМЕТР / DMZ (Граница 1)"]
         direction TB
-        FW["Межсетевой экран<br/>(Firewall)"]:::dmz
-        LMS["LMS<br/>(Облачный/Внешний)"]:::service
+        FW["Межсетевой экран<br/>(Firewall)"]:::dmzNode
+        LMS["LMS<br/>(Веб-доступ)"]:::service
         Journal["Электронный журнал<br/>(Веб-доступ)"]:::service
     end
 
     %% ГРАНИЦА 3: Внутренняя сеть
-    subgraph Internal["🏢 Внутренняя сеть ОУ (Доверительная граница 2)"]
+    subgraph Internal["🏢 ВНУТРЕННЯЯ СЕТЬ (Граница 2)"]
         direction TB
         
-        %% Роли
         Admin["Администрация"]:::user
         TchInt["Педагог<br/>(в школе)"]:::user
         StInt["Обучающийся<br/>(в классе)"]:::user
 
-        %% Сетевое оборудование
-        Switch["Коммутатор<br/>(Сегментация VLAN)"]:::dmz
+        Switch["Коммутатор<br/>(VLAN)"]:::switch
 
-        %% Серверный сегмент
         DB[("Локальная база<br/>контингента")]:::server
-        FileSrv[("Файловый сервер<br/>(Локальное облако)")]:::server
-        NAS[("NAS<br/>(Резервное копирование)")]:::server
+        FileSrv[("Файловый сервер<br/>(Облако)")]:::server
+        NAS[("NAS<br/>(Бэкап)")]:::server
     end
 
-    %% Связи и потоки данных
-    
+    %% --- СВЯЗИ И ПОТОКИ ---
+    %% Явно задаем жирный шрифт для текста на стрелках
+    linkStyle default stroke:#000,stroke-width:2px,color:#000,font-weight:bold;
+
     %% Интернет -> DMZ
-    StExt -->|HTTPS F1| FW
-    TchExt -->|HTTPS F2| FW
-    FW <-->|Доступ| LMS
-    FW <-->|Доступ| Journal
-    StExt -.->|F10 Регистрация| ExtSrv
-    TchInt -.->|F10 Регистрация| ExtSrv
+    StExt ==>|F1 HTTPS| FW
+    TchExt ==>|F2 HTTPS| FW
+    FW <==>|Трафик| LMS
+    FW <==>|Трафик| Journal
+    StExt -.->|F10| ExtSrv
+    TchInt -.->|F10| ExtSrv
 
     %% Внутренняя сеть
-    Admin --- Switch
-    TchInt --- Switch
-    StInt --- Switch
+    Admin === Switch
+    TchInt === Switch
+    StInt === Switch
 
     %% Доступ к серверам
-    Switch -->|F4 Данные| DB
-    Switch -->|F6 Файлы| FileSrv
-    Switch -->|F11 Бэкап| NAS
+    Switch ==>|F4| DB
+    Switch ==>|F6| FileSrv
+    Switch ==>|F11| NAS
 
     %% Межсетевые потоки
-    Switch -->|Выход в интернет| FW
-    FW -->|F1, F2 Синхронизация| LMS
-    FW -->|F3 Оценки| Journal
-    DB -->|F5 Состав классов| Journal
+    Switch ==>|Выход| FW
+    DB ==>|F5| Journal
 
-    %% Привязка стилей к контейнерам
-    class Internet internet;
-    class DMZ dmz;
-    class Internal internal;
+    %% Привязка стилей к зонам
+    class Internet zoneInternet;
+    class DMZ zoneDMZ;
+    class Internal zoneInternal;
