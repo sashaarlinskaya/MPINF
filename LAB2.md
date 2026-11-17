@@ -235,11 +235,16 @@
 
 ```mermaid
 graph LR
-    P[Педагогический сегмент]
-    L[LMS и облачные сервисы]
-    J[Электронный журнал]
-    F[Файловый сервер]
+    %% Настройка контрастных стилей
+    classDef default fill:#ffffff,stroke:#333333,stroke-width:2px,color:#000000;
+    classDef segment fill:#0078D7,stroke:#333333,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef resource fill:#e6f2ff,stroke:#333333,stroke-width:2px,color:#000000,font-weight:bold;
 
-    P -->|Подготовка к урокам, проверка заданий| L
-    P -->|Выставление оценок в своих классах с MFA| J
-    P -->|Чтение и изменение только в своих учебных папках| F
+    P[Педагогический<br>сегмент]:::segment
+    L[LMS и облачные<br>сервисы]:::resource
+    J[Электронный<br>журнал]:::resource
+    F[Файловый<br>сервер]:::resource
+
+    P -->|Подготовка к урокам<br>проверка заданий| L
+    P -->|Выставление оценок<br>в своих классах с MFA| J
+    P -->|Чтение и изменение<br>только своих папок| F
