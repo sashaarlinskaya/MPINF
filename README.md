@@ -1,6 +1,6 @@
 # MPINF
 ## Лабораторная работа 1. Моделирование угроз цифровой образовательной среды
-*  ([Отчет 1]([https://github.com/sashaarlinskaya/ETL/blob/main/lw1.md](https://github.com/sashaarlinskaya/MPINF/blob/main/LAB1.md)))
+*  ([Отчет 1](https://github.com/sashaarlinskaya/MPINF/blob/main/LAB1.md))
 ## Лабораторная работа 2. Проектирование защищённой инфраструктуры образовательной организации
 *  ([Отчет 2](https://github.com/sashaarlinskaya/ETL/blob/main/lw2.md))
 ## Лабораторная работа 3. Расследование инцидента в цифровой образовательной среде
